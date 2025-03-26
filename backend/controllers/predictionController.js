@@ -127,8 +127,39 @@ const getMyPrediction = async (req, res) => {
   }
 };
 
+// @desc    الحصول على عدد توقعات الجلسة
+// @route   GET /api/predictions/session/:sessionId/count
+// @access  Private
+const getSessionPredictionsCount = async (req, res) => {
+  try {
+    const sessionId = req.params.sessionId;
+
+    // التحقق من وجود الجلسة
+    const session = await Session.findById(sessionId);
+    if (!session) {
+      return res.status(404).json({ message: 'الجلسة غير موجودة' });
+    }
+
+    // التحقق مما إذا كان المستخدم مشارك في الجلسة
+    const isParticipant = session.participants.some(
+      (p) => p.user.toString() === req.user._id.toString()
+    );
+    if (!isParticipant) {
+      return res.status(401).json({ message: 'يجب أن تكون مشاركًا في الجلسة للوصول إلى بياناتها' });
+    }
+
+    // الحصول على عدد التوقعات للجلسة
+    const count = await Prediction.countDocuments({ session: sessionId });
+    
+    res.json({ count });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   createPrediction,
   getSessionPredictions,
   getMyPrediction,
+  getSessionPredictionsCount,
 };

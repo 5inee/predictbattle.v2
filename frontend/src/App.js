@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { ToastProvider } from './context/ToastContext';
 import PrivateRoute from './components/routing/PrivateRoute';
 
 // الصفحات
@@ -11,12 +12,14 @@ import GuestLoginPage from './pages/GuestLoginPage';
 import DashboardPage from './pages/DashboardPage';
 import CreateSessionPage from './pages/CreateSessionPage';
 import SessionPage from './pages/SessionPage';
+import ProfilePage from './pages/ProfilePage';
+import NotFoundPage from './pages/NotFoundPage';
 
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <div className="container">
+      <ToastProvider>
+        <Router>
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
@@ -28,6 +31,14 @@ function App() {
               element={
                 <PrivateRoute>
                   <DashboardPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <PrivateRoute>
+                  <ProfilePage />
                 </PrivateRoute>
               }
             />
@@ -47,9 +58,11 @@ function App() {
                 </PrivateRoute>
               }
             />
+            
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
-        </div>
-      </Router>
+        </Router>
+      </ToastProvider>
     </AuthProvider>
   );
 }

@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "PredictBattle",
+  "name": "PredictBattle - منصة توقعات تفاعلية",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +20,8 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#5e60ce",
+  "background_color": "#f8f9fa",
+  "dir": "rtl",
+  "lang": "ar"
 }

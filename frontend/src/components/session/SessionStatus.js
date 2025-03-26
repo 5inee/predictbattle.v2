@@ -3,8 +3,13 @@ import React from 'react';
 const SessionStatus = ({ session, predictions }) => {
   if (!session) return null;
 
-  const totalParticipants = session.maxPlayers; // استخدام الحد الأقصى للاعبين بدلاً من عدد المشاركين الحالي
-  const predictionsCount = predictions ? predictions.length : 0;
+  const totalParticipants = session.maxPlayers;
+  
+  // استخدام عدد التوقعات من predictions إذا كان متاحًا
+  // أو من session.predictionsCount إذا تم تعيينه
+  // أو 0 كملاذ أخير
+  const predictionsCount = predictions?.length || session.predictionsCount || 0;
+  
   const isPending = predictionsCount < totalParticipants;
 
   return (
