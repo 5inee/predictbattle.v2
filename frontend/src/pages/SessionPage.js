@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
 import AuthContext from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -11,9 +11,8 @@ import Loader from '../components/common/Loader';
 
 const SessionPage = () => {
   const { code } = useParams();
-  const { user, token } = useContext(AuthContext);
+  const { token } = useContext(AuthContext);
   const { success, error: toastError } = useToast();
-  const navigate = useNavigate();
   const predictionContainerRef = useRef(null);
   
   const [session, setSession] = useState(null);
@@ -29,65 +28,46 @@ const SessionPage = () => {
   // تحميل بيانات الجلسة
   useEffect(() => {
     const fetchSession = async () => {
-        try {
-          setError(null);
-          const res = await axios.get(`${process.env.REACT_APP_API_URL}/sessions/code/${code}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          setSession(res.data);
-          
-          // تحميل توقع المستخدم الحالي
-          const myPredRes = await axios.get(`${process.env.REACT_APP_API_URL}/predictions/my/${res.data._id}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          setMyPrediction(myPredRes.data);
-          
-          // الحصول على عدد التوقعات، سواء كان المستخدم قدم توقعه أم لا
+      try {
+        setError(null);
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/sessions/code/${code}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setSession(res.data);
+        
+        // تحميل توقع المستخدم الحالي
+        const myPredRes = await axios.get(`${process.env.REACT_APP_API_URL}/predictions/my/${res.data._id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setMyPrediction(myPredRes.data);
+        
+        // إذا كان المستخدم قد قدم توقعًا أو كانت الجلسة مكتملة، قم بتحميل جميع التوقعات
+        if (myPredRes.data || res.data.isComplete) {
           try {
-            const countRes = await axios.get(`${process.env.REACT_APP_API_URL}/predictions/session/${res.data._id}/count`, {
+            const predsRes = await axios.get(`${process.env.REACT_APP_API_URL}/predictions/session/${res.data._id}`, {
               headers: {
                 Authorization: `Bearer ${token}`,
               },
             });
-            
-            const predictionsCount = countRes.data.count;
-            
-            // إذا كان المستخدم قد قدم توقعه أو كانت الجلسة مكتملة، قم بتحميل محتوى التوقعات
-            if (myPredRes.data || res.data.isComplete) {
-              try {
-                const predsRes = await axios.get(`${process.env.REACT_APP_API_URL}/predictions/session/${res.data._id}`, {
-                  headers: {
-                    Authorization: `Bearer ${token}`,
-                  },
-                });
-                setPredictions(predsRes.data);
-              } catch (error) {
-                console.error('فشل في تحميل التوقعات:', error);
-                toastError('فشل في تحميل التوقعات');
-                // في حالة الفشل، نريد على الأقل تعيين عدد التوقعات في الحالة
-                setSession(prev => ({ ...prev, predictionsCount }));
-              }
-            } else {
-              // تعيين عدد التوقعات في كائن الجلسة دون تحميل محتوى التوقعات
-              setSession(prev => ({ ...prev, predictionsCount }));
-              setPredictions([]); // لا نعرض أي توقعات إذا لم يقدم المستخدم توقعه بعد
-            }
+            setPredictions(predsRes.data);
           } catch (error) {
-            console.error('فشل في تحميل عدد التوقعات:', error);
+            console.error('فشل في تحميل التوقعات:', error);
+            toastError('فشل في تحميل التوقعات');
           }
-        } catch (err) {
-          setError(err.response?.data?.message || 'فشل في تحميل بيانات الجلسة');
-          toastError('فشل في تحميل بيانات الجلسة');
-          console.error(err);
-        } finally {
-          setLoading(false);
-          setRefreshing(false);
         }
-      };
+      } catch (err) {
+        setError(err.response?.data?.message || 'فشل في تحميل بيانات الجلسة');
+        toastError('فشل في تحميل بيانات الجلسة');
+        console.error(err);
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
+      }
+    };
     
     fetchSession();
     
@@ -99,7 +79,7 @@ const SessionPage = () => {
     }, 30000);
     
     return () => clearInterval(intervalId);
-  }, [code, token, refreshing]);
+  }, [code, token, refreshing, session, submitting, toastError]);
   
   // تقديم توقع جديد
   const submitPrediction = async (e) => {
@@ -289,23 +269,23 @@ const SessionPage = () => {
                   <h2 className="section-title">التوقعات</h2>
                   
                   {predictions.length > 0 ? (
-  <div className="predictions-container" ref={predictionContainerRef}>
-    {predictions.map((prediction) => (
-      <PredictionCard key={prediction._id} prediction={prediction} />
-    ))}
-  </div>
-) : (
-  <div className="empty-predictions">
-    {refreshing ? (
-      <Loader text="جاري تحميل التوقعات..." />
-    ) : (
-      <div className="waiting-predictions">
-        <i className="fas fa-clock waiting-icon"></i>
-        <p>في انتظار توقعات المشاركين...</p>
-      </div>
-    )}
-  </div>
-)}
+                    <div className="predictions-container" ref={predictionContainerRef}>
+                      {predictions.map((prediction) => (
+                        <PredictionCard key={prediction._id} prediction={prediction} />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="empty-predictions">
+                      {refreshing ? (
+                        <Loader text="جاري تحميل التوقعات..." />
+                      ) : (
+                        <div className="waiting-predictions">
+                          <i className="fas fa-clock waiting-icon"></i>
+                          <p>في انتظار توقعات المشاركين...</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
             </div>

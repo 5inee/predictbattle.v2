@@ -9,7 +9,7 @@ const PrivateRoute = ({ children }) => {
     return <div className="page"><div className="page-header">جاري التحميل...</div></div>;
   }
 
-  // يجب تغيير المسار هنا من '/login' إلى '/'
+  // تغيير المسار من '/login' إلى '/'
   return token ? children : <Navigate to="/" />;
 };
 

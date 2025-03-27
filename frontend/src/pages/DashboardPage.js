@@ -7,7 +7,7 @@ import Alert from '../components/layout/Alert';
 import SessionCard from '../components/prediction/SessionCard';
 
 const DashboardPage = () => {
-  const { user, token } = useContext(AuthContext);
+  const { token } = useContext(AuthContext);
   const navigate = useNavigate();
   
   const [activeTab, setActiveTab] = useState('join');

@@ -1,6 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import AuthContext from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import Layout from '../components/layout/Layout';
@@ -8,7 +7,7 @@ import Loader from '../components/common/Loader';
 import Alert from '../components/layout/Alert';
 
 const ProfilePage = () => {
-  const { user, token, setError } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const { success, error: toastError } = useToast();
   const navigate = useNavigate();
   
@@ -25,7 +24,7 @@ const ProfilePage = () => {
 
   useEffect(() => {
     // يمكن إضافة تحميل بيانات المستخدم هنا إذا كان هناك حاجة لمزيد من البيانات
-  }, [token]);
+  }, []);
   
   const onChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -69,7 +68,7 @@ const ProfilePage = () => {
         confirmPassword: '',
       });
     } catch (err) {
-      setLocalError(err.response?.data?.message || 'حدث خطأ أثناء تغيير كلمة المرور');
+      setLocalError(err?.response?.data?.message || 'حدث خطأ أثناء تغيير كلمة المرور');
       toastError('حدث خطأ أثناء تغيير كلمة المرور');
     } finally {
       setLoading(false);
