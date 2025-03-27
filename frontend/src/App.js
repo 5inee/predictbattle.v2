@@ -5,6 +5,7 @@ import { ToastProvider } from './context/ToastContext';
 import PrivateRoute from './components/routing/PrivateRoute';
 
 // الصفحات
+// في App.js تأكد من أن كل هذه الملفات موجودة
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';

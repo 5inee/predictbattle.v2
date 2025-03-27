@@ -10,6 +10,7 @@ const Header = () => {
 
   const handleLogout = () => {
     logout();
+    // التوجيه إلى الصفحة الرئيسية بدلاً من صفحة تسجيل الدخول
     navigate('/');
   };
 

@@ -22,5 +22,11 @@
         "src": "/(.*)",
         "dest": "frontend/build/$1"
       }
-    ]
+    ],
+    "env": {
+      "MONGODB_URI": "mongodb://mongo:BLCeHJTKbUGkelkfcEASmDphLBnDaiur@crossover.proxy.rlwy.net:23883",
+      "JWT_SECRET": "predictbattle_supersecret_key",
+      "PORT": "5000",
+      "NODE_ENV": "production"
+    }
   }
